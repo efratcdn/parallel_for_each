@@ -40,10 +40,15 @@ A Solution:
      1) increases a counter
      2) calls the method
      3) decreases the counter
+     4) if the counter reaches 0 - a static event is emitted
 
    The calling method start the wrapper of all the units in the list, and 
-   waits for the counter to reach 0, indicating that all methods execution ended.
-
+   waits for the event, indicating that all methods execution ended.
+  
+   One difference if this implementation from 'all of', is that when using 'all of' 
+   when the calling thread is terminated all the sub threads are terminated.
+   With this solution, the sub threads are started (and not called), so even if 
+   the calling thread is terminated - they continue running. 
 
    See an example for such a wrapper in e_util_parallel_for_each_manual_code.e
 
