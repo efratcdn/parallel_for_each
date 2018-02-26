@@ -54,6 +54,8 @@ Example       : See usage example e_util_parallel_for_each_usage_ex.e
 
 define <e_util_wrap_for_parallel_for_each'struct_member> "wrap_for_parallel <method'name>" as {
     static <method'name>_execution_ctr : int = 0;
+
+    static event <method'name>_finished;
     
     static <method'name>_increase () is {
         <method'name>_execution_ctr += 1;
@@ -62,6 +64,9 @@ define <e_util_wrap_for_parallel_for_each'struct_member> "wrap_for_parallel <met
     static <method'name>_decrease () is {
         <method'name>_execution_ctr -= 1;
         assert <method'name>_execution_ctr >= 0;
+        if <method'name>_execution_ctr == 0 {
+            emit <method'name>_finished;
+        };
     };
     
     static <method'name>_get_ctr() : int is {
@@ -76,16 +81,24 @@ define <e_util_wrap_for_parallel_for_each'struct_member> "wrap_for_parallel <met
     };    
 };
 
+
+
+ 
+
 define <e_util_run_in_parallel_for_each'action> "for_each_in_parallel <field_name'name> <field_type'name> <method_name'name>" as {
+    
+    // Prevent multiple entrance (for same method)
+    assert <field_type'name>::<method_name'name>_get_ctr() == 0 else
+      error("Calling for_each_in_parallel of a method while previous parallel execution of ",
+            "same method was not finished, is not supported");
+    
     for each in <field_name'name> {
         start it.<method_name'name>_wrap();
     };
     
     message(HIGH, "started them all");
     sync cycle;
-    while <field_type'name>::<method_name'name>_get_ctr() > 0 {
-        wait cycle;
-    };
+    sync @<field_type'name>::<method_name'name>_finished;
 };
 
 
