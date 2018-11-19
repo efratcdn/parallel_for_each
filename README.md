@@ -8,6 +8,8 @@
 [ More e code examples in https://github.com/efratcdn/spmn-e-utils ]
 
 
+NOTE:  Next Specman version - 19.03 - will contain support of "parallel for each". Once you upgrade to this version - no need for the utility any more.
+
 The Requirement:
 
    Need a feature that is a combination of  "for each in list" and "all of".
